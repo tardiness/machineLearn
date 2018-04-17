@@ -1,4 +1,5 @@
 from math import log
+import operator
 
 
 def calcShannonEnt (dataSet):
@@ -55,6 +56,37 @@ def chooseBestFeatureToSplit(dataSet):
     return bastFeature
 
 
+def majorityCnt(classList):
+    classCount = {}
+    for vote in classList:
+        if vote not in classCount.keys():
+            classCount[vote] = 0
+        classCount[vote] += 1
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
+
+
+def createTree(dataSet, labels):
+    classList = [example[-1] for example in dataSet]
+    #  如果classList的值全都相等
+    if classList.count(classList[0]) == len(classList):
+        return classList[0]
+    #  便利完了都没找到 唯一的分组 选出出现次数最多的
+    if len(dataSet[0]) == 1:
+        return majorityCnt(classList)
+    bestFeat = chooseBestFeatureToSplit(dataSet)
+    bestFeatLabel = labels[bestFeat]
+    myTree = {bestFeatLabel: {}}
+    #  删掉  是因为已经为树添加了一个节点（就是 labels[bestFeat]）
+    del(labels[bestFeat])
+    featValues = [example[bestFeat] for example in dataSet]
+    uniqueVals = set(featValues)
+    for value in uniqueVals:
+        sublabels = labels[:]
+        myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), sublabels)
+    return myTree
+
+
 def createDataSet():
     dataSet = [
         [1, 1, 'yes'],
@@ -73,3 +105,6 @@ if __name__ == "__main__":
     retData = splitDataSet(dataSet, 0, 1)
     print(calcShannonEnt(retData))
     print(chooseBestFeatureToSplit(dataSet))
+    myTree = createTree(dataSet, labels)
+    print(myTree)
+
