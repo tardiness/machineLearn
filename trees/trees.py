@@ -3,6 +3,8 @@ import operator
 
 
 def calcShannonEnt (dataSet):
+    # ID3 算法 以信息熵的下降速度为选取测试属性的标准，即在每个节点选取还尚未被用来划分的具有最高信息增益的属性作为划分标准，
+    # 然后继续这个过程，直到生成的决策树能完美分类训练样例
     #  香农熵
     numEntries = len(dataSet)
     labelCounts = {}
@@ -87,7 +89,34 @@ def createTree(dataSet, labels):
     return myTree
 
 
+def classify(inputTree, featLabels, testVec):
+    firstStr = list(inputTree.keys())[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == "dict":
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
+
+
+def storeTree(inputTree, filename):
+    import pickle
+    fw = open(filename, "wb")
+    pickle.dump(inputTree, fw)
+    fw.close()
+
+
+def grabTree(filename):
+    import pickle
+    fr = open(filename, "rb")
+    return pickle.load(fr)
+
+
 def createDataSet():
+    #  yes是鱼类 no 不是鱼类
     dataSet = [
         [1, 1, 'yes'],
         [1, 1, 'yes'],
@@ -95,6 +124,7 @@ def createDataSet():
         [0, 1, 'no'],
         [0, 1, 'no']
     ]
+    #  no surfacing 付出水面能生存  flippers 是否有脚蹼
     labels = ['no surfacing', 'flippers']
     return dataSet, labels
 
