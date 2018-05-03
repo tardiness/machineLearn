@@ -4,13 +4,14 @@ from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
 from model_selection import train_test_split
 from preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
 
 def mykNN():
     data = datasets.load_digits()
     X = data.data
     y = data.target
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, seed=5)
 
     """
     # best_p = -1
@@ -40,8 +41,14 @@ def mykNN():
     standardScaler.fit(X_train)
     X_standard_train = standardScaler.transform(X_train)
     X_standard_test = standardScaler.transform(X_test)
+    # plt.scatter(X_standard_train[0, :], X_standard_train[1, :])
+    # plt.show()
     myKNN.fit(X_standard_train, y_train)
     print(myKNN.score(X_standard_test, y_test))
+    # plt.scatter(X_train[0, :], X_train[1, :])
+    # plt.show()
+    myKNN.fit(X_train, y_train)
+    print(myKNN.score(X_test, y_test))
 
 
 def sklearn_test():
@@ -73,10 +80,10 @@ def sklearn_test():
     standardScaler.fit(X_train)
     X_standard_train = standardScaler.transform(X_train)
     X_standard_test = standardScaler.transform(X_test)
+    # plt.scatter(X_standard_train[0, :], X_standard_train[1, :])
+    # plt.show()
     kNight.fit(X_standard_train, y_train)
     print(kNight.score(X_standard_test, y_test))
-
-
 
 
 if __name__ == "__main__":
